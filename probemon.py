@@ -1,15 +1,16 @@
 #!/usr/bin/python
 
+import os
 import time
 import datetime
 import argparse
 import netaddr
 import sys
 import logging
+import numpy
 from scapy.all import *
 from pprint import pprint
 from logging.handlers import RotatingFileHandler
-
 
 NAME = 'probemon'
 DESCRIPTION = "a command line tool for logging 802.11 probe request frames"
@@ -67,12 +68,14 @@ def main():
 	parser.add_argument('-o', '--output', default='probemon.log', help="logging output location")
 	parser.add_argument('-b', '--max-bytes', default=5000000, help="maximum log size in bytes before rotating")
 	parser.add_argument('-c', '--max-backups', default=99999, help="maximum number of log files to keep")
-	parser.add_argument('-d', '--delimiter', default='\t', help="output field delimiter")
+	parser.add_argument('-d', '--delimiter', default=';', help="output field delimiter")
 	parser.add_argument('-f', '--mac-info', action='store_true', help="include MAC address manufacturer")
 	parser.add_argument('-s', '--ssid', action='store_true', help="include probe SSID in output")
 	parser.add_argument('-r', '--rssi', action='store_true', help="include rssi in output")
 	parser.add_argument('-D', '--debug', action='store_true', help="enable debug output")
 	parser.add_argument('-l', '--log', action='store_true', help="enable scrolling live view of the logfile")
+	parser.add_argument('-e', '--exclude', default='exclude.conf', help="list of MAC addresses to exclude from output, one MAC per line")
+	parser.add_argument('-z', '--daemon', action='store_true', help="fork process and run in background")
 	args = parser.parse_args()
 
 	if not args.interface:
@@ -80,6 +83,14 @@ def main():
 		sys.exit(-1)
 	
 	DEBUG = args.debug
+	
+	if args.daemon:
+		fpid = os.fork()
+		if fpid!=0:
+			sys.exit(0)
+
+	global exclude
+	exclude = numpy.genfromtxt(args.exclude, delimiter="\t", dtype=None)
 
 	# setup our rotating logger
 	logger = logging.getLogger(NAME)
