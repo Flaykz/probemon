@@ -8,6 +8,7 @@ import netaddr
 import sys
 import logging
 import numpy
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 from pprint import pprint
 from logging.handlers import RotatingFileHandler
@@ -79,6 +80,10 @@ def main():
 	parser.add_argument('-e', '--exclude', default='exclude.conf', help="list of MAC addresses to exclude from output, one MAC per line")
 	parser.add_argument('-z', '--daemon', action='store_true', help="fork process and run in background")
 	args = parser.parse_args()
+
+	if os.geteuid() != 0:
+		print '[FATAL]: You have to be root to run this script'
+		sys.exit(-1)
 
 	if not args.interface:
 		print "error: capture interface not given, try --help"
