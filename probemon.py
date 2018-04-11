@@ -69,7 +69,7 @@ def main():
 	parser.add_argument('-i', '--interface', help="capture interface")
 	parser.add_argument('-t', '--time', default='iso', help="output time format (unix, iso)")
 	parser.add_argument('-o', '--output', default='probemon.log', help="logging output location")
-	parser.add_argument('-b', '--max-bytes', default=5000000, help="maximum log size in bytes before rotating")
+	parser.add_argument('-b', '--max-bytes', default=5242880, help="maximum log size in bytes before rotating")
 	parser.add_argument('-c', '--max-backups', default=99999, help="maximum number of log files to keep")
 	parser.add_argument('-d', '--delimiter', default=';', help="output field delimiter")
 	parser.add_argument('-f', '--mac-info', action='store_true', help="include MAC address manufacturer")
